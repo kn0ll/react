@@ -63,16 +63,16 @@ export function setValueForStyles(node, styles) {
       continue;
     }
     const isCustomProperty = styleName.indexOf('--') === 0;
-    if (__DEV__) {
-      if (!isCustomProperty) {
-        warnValidStyle(styleName, styles[styleName]);
-      }
-    }
     const styleValue = dangerousStyleValue(
       styleName,
       styles[styleName],
       isCustomProperty,
     );
+    if (__DEV__) {
+      if (!isCustomProperty) {
+        warnValidStyle(styleName, styles[styleName], styleValue);
+      }
+    }
     if (styleName === 'float') {
       styleName = 'cssFloat';
     }

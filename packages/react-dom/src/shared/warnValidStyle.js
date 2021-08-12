@@ -94,7 +94,15 @@ if (__DEV__) {
     );
   };
 
-  warnValidStyle = function(name, value) {
+  const warnStyleValueIsUnsupported = function(name, value) {
+    console.error(
+      '`%s` is an invalid value for the `%s` css style property.',
+      value,
+      name,
+    );
+  };
+
+  warnValidStyle = function(name, value, styleValue) {
     if (name.indexOf('-') > -1) {
       warnHyphenatedStyleName(name);
     } else if (badVendoredStyleNamePattern.test(name)) {
@@ -103,11 +111,18 @@ if (__DEV__) {
       warnStyleValueWithSemicolon(name, value);
     }
 
-    if (typeof value === 'number') {
-      if (isNaN(value)) {
-        warnStyleValueIsNaN(name, value);
-      } else if (!isFinite(value)) {
-        warnStyleValueIsInfinity(name, value);
+    if (typeof value === 'number' && isNaN(value)) {
+      warnStyleValueIsNaN(name, value);
+    } else if (typeof value === 'number' && !isFinite(value)) {
+      warnStyleValueIsInfinity(name, value);
+    } else if (
+      typeof CSS !== 'undefined' &&
+      typeof CSS.supports !== 'undefined'
+    ) {
+      const div = document.createElement('div');
+      div.style[name] = styleValue;
+      if (!CSS.supports(div.style.item(0), styleValue)) {
+        warnStyleValueIsUnsupported(name, value);
       }
     }
   };
